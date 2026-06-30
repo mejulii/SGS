@@ -1,0 +1,11 @@
+{
+  "name": "sgs",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "sequelize": "^6.35.2",
+    "sqlite3": "^5.1.6"
+  }
+}
