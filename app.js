@@ -69,4 +69,54 @@ app.get('/usuarios/:id/excluir', async (req, res) => {
     res.redirect('/usuarios');
 });
 
+// ===================== SOLICITAÇÕES =====================
+
+// LISTAR SOLICITAÇÕES
+app.get('/solicitacoes', async (req, res) => {
+    const solicitacoesRaw = await Solicitacao.findAll({ include: Usuario });
+    const solicitacoes = solicitacoesRaw.map(s => s.toJSON());
+    res.render('listarSolicitacoes', { solicitacoes });
+});
+
+// FORMULÁRIO CADASTRAR
+app.get('/solicitacoes/cadastrar', async (req, res) => {
+    const usuarios = await Usuario.findAll({ where: { tipo: 'solicitante' }, raw: true });
+    res.render('cadastrarSolicitacao', { usuarios });
+});
+
+// SALVAR NOVA SOLICITAÇÃO
+app.post('/solicitacoes', async (req, res) => {
+    const { titulo, descricao, usuarioId, prioridade } = req.body;
+    await Solicitacao.create({ titulo, descricao, usuarioId, prioridade, status: 'pendente' });
+    res.redirect('/solicitacoes');
+});
+
+// FORMULÁRIO EDITAR
+app.get('/solicitacoes/:id/editar', async (req, res) => {
+    const id = req.params.id;
+    const solicitacao = await Solicitacao.findByPk(id, { raw: true });
+    const usuarios = await Usuario.findAll({ where: { tipo: 'solicitante' }, raw: true });
+    res.render('editarSolicitacao', { solicitacao, usuarios });
+});
+
+// SALVAR EDIÇÃO
+app.post('/solicitacoes/:id/editar', async (req, res) => {
+    const id = req.params.id;
+    const { titulo, descricao, usuarioId, prioridade } = req.body;
+    const solicitacao = await Solicitacao.findByPk(id);
+    solicitacao.titulo = titulo;
+    solicitacao.descricao = descricao;
+    solicitacao.usuarioId = usuarioId;
+    solicitacao.prioridade = prioridade;
+    await solicitacao.save();
+    res.redirect('/solicitacoes');
+});
+
+// EXCLUIR
+app.get('/solicitacoes/:id/excluir', async (req, res) => {
+    const id = req.params.id;
+    const solicitacao = await Solicitacao.findByPk(id);
+    await solicitacao.destroy();
+    res.redirect('/solicitacoes');
+});
 
