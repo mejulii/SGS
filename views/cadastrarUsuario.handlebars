@@ -1,0 +1,117 @@
+<html>
+<head>
+    <title>Cadastrar Usuário</title>
+    <style>
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 40px;
+        }
+
+       #divPrincipal{
+    width:90%;
+    max-width:1100px;
+    margin:35px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+        label {
+            font-size: 16px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 16px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+    .btn{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+    margin-right:10px;
+}
+
+.home{
+    background:#6b7280;
+}
+
+.novo{
+    background:#2563eb;
+}
+
+.editar{
+    background:#f59e0b;
+}
+
+.excluir{
+    background:#dc2626;
+}
+
+        a {
+            font-size: 16px;
+            color: black;
+        }
+
+        body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#eef2f7;
+}
+
+.topo{
+    background:black;
+    color:white;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+}
+    </style>
+</head>
+<body>
+    <header class="topo">
+    <h1>Sistema de Gestão de Solicitações</h1>
+</header>
+    <h1>Cadastrar Usuário</h1>
+
+    <div id="divPrincipal">
+        <a href="/usuarios">Voltar</a>
+
+        <br><br>
+
+        <form action="/usuarios" method="POST">
+
+            <label for="iptNome">Nome</label>
+            <input type="text" id="iptNome" name="nome" required>
+
+            <label for="iptEmail">Email</label>
+            <input type="email" id="iptEmail" name="email" required>
+
+            <label for="iptSetor">Setor</label>
+            <input type="text" id="iptSetor" name="setor" required>
+
+            <label for="iptTipo">Tipo</label>
+            <select id="iptTipo" name="tipo" required>
+                <option value="">Selecione...</option>
+                <option value="administrador">Administrador</option>
+                <option value="solicitante">Solicitante</option>
+            </select>
+
+            <button type="submit">Cadastrar</button>
+
+        </form>
+    </div>
+</body>
+</html>

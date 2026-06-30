@@ -1,0 +1,83 @@
+<html>
+<head>
+    <title>Editar Usuário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: ghostwhite;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 40px;
+        }
+
+        #divPrincipal {
+            width: 50%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+            padding: 30px;
+        }
+
+        label {
+            font-size: 16px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 16px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        a {
+            font-size: 16px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Editar Usuário</h1>
+
+    <div id="divPrincipal">
+        <a href="/usuarios">Voltar</a>
+
+        <br><br>
+
+        <form action="/usuarios/{{usuario.id}}/editar" method="POST">
+
+            <label for="iptNome">Nome</label>
+            <input type="text" id="iptNome" name="nome" value="{{usuario.nome}}" required>
+
+            <label for="iptEmail">Email</label>
+            <input type="email" id="iptEmail" name="email" value="{{usuario.email}}" required>
+
+            <label for="iptSetor">Setor</label>
+            <input type="text" id="iptSetor" name="setor" value="{{usuario.setor}}" required>
+
+            <label for="iptTipo">Tipo</label>
+            <select id="iptTipo" name="tipo" required>
+                <option value="">Selecione...</option>
+                <option value="administrador">Administrador</option>
+                <option value="solicitante">Solicitante</option>
+            </select>
+
+            <button type="submit">Salvar</button>
+
+        </form>
+    </div>
+</body>
+</html>
