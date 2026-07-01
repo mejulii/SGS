@@ -1,0 +1,95 @@
+<html>
+<head>
+    <title>Editar Solicitação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: ghostwhite;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 40px;
+        }
+
+        #divPrincipal {
+            width: 50%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+            padding: 30px;
+        }
+
+        label {
+            font-size: 16px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 16px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            font-size: 15px;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        a {
+            font-size: 16px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Editar Solicitação</h1>
+
+    <div id="divPrincipal">
+        <a href="/solicitacoes">Voltar</a>
+
+        <br><br>
+
+        <form action="/solicitacoes/{{solicitacao.id}}/editar" method="POST">
+
+            <label for="iptTitulo">Título</label>
+            <input type="text" id="iptTitulo" name="titulo" value="{{solicitacao.titulo}}" required>
+
+            <label for="iptDescricao">Descrição</label>
+            <textarea id="iptDescricao" name="descricao" required>{{solicitacao.descricao}}</textarea>
+
+            <label for="iptUsuario">Solicitante</label>
+            <select id="iptUsuario" name="usuarioId" required>
+                <option value="">Selecione...</option>
+                {{#each usuarios}}
+                <option value="{{id}}" {{#ifEquals id ../solicitacao.usuarioId}}selected{{/ifEquals}}>{{nome}}</option>
+                {{/each}}
+            </select>
+
+            <label for="iptPrioridade">Prioridade</label>
+            <select id="iptPrioridade" name="prioridade" required>
+                <option value="">Selecione...</option>
+                <option value="baixa" {{#ifEquals solicitacao.prioridade "baixa"}}selected{{/ifEquals}}>Baixa</option>
+                <option value="media" {{#ifEquals solicitacao.prioridade "media"}}selected{{/ifEquals}}>Média</option>
+                <option value="alta" {{#ifEquals solicitacao.prioridade "alta"}}selected{{/ifEquals}}>Alta</option>
+            </select>
+
+            <button type="submit">Salvar</button>
+
+        </form>
+    </div>
+</body>
+</html>
