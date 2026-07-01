@@ -120,5 +120,44 @@ app.get('/solicitacoes/:id/excluir', async (req, res) => {
     res.redirect('/solicitacoes');
 });
 
+// ===================== APROVAÇÃO / REJEIÇÃO =====================
 
+// LISTAR SOLICITAÇÕES PENDENTES PARA APROVAÇÃO
+app.get('/solicitacoes/aprovacao', async (req, res) => {
+    const solicitacoesRaw = await Solicitacao.findAll({
+        where: { status: 'pendente' },
+        include: Usuario
+    });
+    const solicitacoes = solicitacoesRaw.map(s => s.toJSON());
+    res.render('aprovarSolicitacoes', { solicitacoes });
+});
+
+// APROVAR SOLICITAÇÃO
+app.post('/solicitacoes/:id/aprovar', async (req, res) => {
+    const id = req.params.id;
+    const solicitacao = await Solicitacao.findByPk(id);
+    solicitacao.status = 'aprovada';
+    solicitacao.motivoRejeicao = null;
+    await solicitacao.save();
+    res.redirect('/solicitacoes/aprovacao');
+});
+
+// REJEITAR SOLICITAÇÃO
+app.post('/solicitacoes/:id/rejeitar', async (req, res) => {
+    const id = req.params.id;
+    const { motivoRejeicao } = req.body;
+    const solicitacao = await Solicitacao.findByPk(id);
+    solicitacao.status = 'rejeitada';
+    solicitacao.motivoRejeicao = motivoRejeicao;
+    await solicitacao.save();
+    res.redirect('/solicitacoes/aprovacao');
+});
+
+async function iniciar() {
+    await sequelize.sync();
+    console.log('Banco de dados conectado!');
+    app.listen(3000, () => console.log('Servidor rodando em http://localhost:3000'));
+}
+
+iniciar();
 

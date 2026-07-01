@@ -1,0 +1,168 @@
+<html>
+<head>
+    <title>Aprovação de Solicitações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: ghostwhite;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 40px;
+        }
+
+        #divPrincipal {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+            padding: 20px;
+        }
+
+      table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background: black;
+    color:white;
+    padding:14px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+}
+
+tbody tr:nth-child(even){
+    background:#f8fafc;
+}
+
+tbody tr:hover{
+    background:#e0ecff;
+}
+
+.btn{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+    margin-right:10px;
+    border:none;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.home{
+    background:#6b7280;
+}
+
+.aprovar{
+    background:#16a34a;
+}
+
+.rejeitar{
+    background:#dc2626;
+}
+
+.status{
+    padding:5px 10px;
+    border-radius:5px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.status-pendente{
+    background:#f59e0b;
+}
+
+.status-aprovada{
+    background:#16a34a;
+}
+
+.status-rejeitada{
+    background:#dc2626;
+}
+
+.semRegistros{
+    text-align:center;
+    padding:30px;
+    color:#6b7280;
+    font-size:18px;
+}
+
+.motivoBox{
+    margin-top:6px;
+}
+
+.motivoBox textarea{
+    width:100%;
+    box-sizing:border-box;
+    border:1px solid gray;
+    border-radius:5px;
+    padding:6px;
+    font-family:Arial, Helvetica, sans-serif;
+    resize:vertical;
+}
+    </style>
+</head>
+<body>
+    <h1>Aprovação de Solicitações</h1>
+
+    <div id="divPrincipal">
+        <a href="/" class="btn home">Home</a>
+
+        <br><br>
+
+        {{#if solicitacoes}}
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Solicitante</th>
+                    <th>Prioridade</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each solicitacoes}}
+                <tr>
+                    <td>{{titulo}}</td>
+                    <td>{{descricao}}</td>
+                    <td>{{Usuario.nome}}</td>
+                    <td>{{prioridade}}</td>
+                    <td>
+                        <span class="status status-{{status}}">{{status}}</span>
+                    </td>
+                    <td>
+                        <form action="/solicitacoes/{{id}}/aprovar" method="POST" style="display:inline;">
+                            <button type="submit" class="btn aprovar" onclick="return confirm('Confirma a aprovação desta solicitação?')">Aprovar</button>
+                        </form>
+
+                        <form action="/solicitacoes/{{id}}/rejeitar" method="POST" style="display:inline-block;" onsubmit="return confirm('Confirma a rejeição desta solicitação?')">
+                            <div class="motivoBox">
+                                <textarea name="motivoRejeicao" rows="2" placeholder="Motivo da rejeição (opcional)"></textarea>
+                            </div>
+                            <button type="submit" class="btn rejeitar">Rejeitar</button>
+                        </form>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="semRegistros">Não há solicitações pendentes de aprovação.</p>
+        {{/if}}
+    </div>
+</body>
+</html>
