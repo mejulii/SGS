@@ -1,98 +1,54 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <title>Usuários</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: ghostwhite;
-        }
-
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 40px;
-        }
-
-        #divPrincipal {
-            width: 80%;
-            margin: 20px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px gray;
-            padding: 20px;
-        }
-
-      table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-
-th{
-    background: black;
-    color:white;
-    padding:14px;
-}
-
-td{
-    padding:12px;
-    border-bottom:1px solid #ddd;
-}
-
-tbody tr:nth-child(even){
-    background:#f8fafc;
-}
-
-tbody tr:hover{
-    background:#e0ecff;
-}
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - SGS</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Usuários</h1>
+    <header class="site-header"><div class="container"><p class="site-title">Sistema de Gestão de Solicitações</p></div></header>
 
-    <div id="divPrincipal">
-        <a href="/" class="btn home">Home</a>
+    <main class="page-card">
+        <h1 class="page-heading">Usuários</h1>
 
-<a href="/usuarios/cadastrar" class="btn novo">
-Novo Usuário
-</a>
+        <nav aria-label="Navegação principal" class="navigation">
+            <a href="/">Home</a>
+            <a href="/usuarios/cadastrar">Novo Usuário</a>
+            <a href="/solicitacoes">Solicitações</a>
+            <a href="/solicitacoes/aprovacao">Aprovação</a>
+        </nav>
 
-        <br><br>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Setor</th>
-                    <th>Tipo</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each usuarios}}
-                <tr>
-                    <td>{{nome}}</td>
-                    <td>{{email}}</td>
-                    <td>{{setor}}</td>
-                    <td>{{tipo}}</td>
-                    <td>
-                        <a href="/usuarios/{{id}}/editar"
-class="btn editar">
-Editar
-</a>
-
-<a href="/usuarios/{{id}}/excluir"
-class="btn excluir"
-onclick="return confirm('Deseja excluir este usuário?')">
-Excluir
-</a>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
+        <div class="table-wrapper">
+            <table>
+                <caption>Lista de usuários cadastrados</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Setor</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each usuarios}}
+                    <tr>
+                        <td>{{nome}}</td>
+                        <td>{{email}}</td>
+                        <td>{{setor}}</td>
+                        <td>{{tipo}}</td>
+                        <td>
+                            <div class="actions">
+                                <a href="/usuarios/{{id}}/editar" class="btn-secondary" aria-label="Editar usuário {{nome}}">Editar</a>
+                                <a href="/usuarios/{{id}}/excluir" class="btn-danger" aria-label="Excluir usuário {{nome}}" onclick="return confirm('Deseja excluir este usuário?')">Excluir</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </main>
 </body>
 </html>

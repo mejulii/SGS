@@ -5,12 +5,19 @@ const Usuario = sequelize.define('Usuario', {
     nome: {
         type: DataTypes.STRING,
     },
+
     email: {
         type: DataTypes.STRING,
     },
+
+    senha: {
+        type: DataTypes.STRING,
+    },
+
     setor: {
         type: DataTypes.STRING,
     },
+
     tipo: {
         type: DataTypes.STRING,
     }

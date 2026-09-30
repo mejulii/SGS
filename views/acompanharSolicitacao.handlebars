@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Acompanhar Solicitação - SGS
+    </title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="container">
+
+        <p class="site-title">
+            Sistema de Gestão de Solicitações
+        </p>
+
+    </div>
+
+</header>
+
+
+<main class="page-card medium">
+
+    <a
+        href="/solicitacoes"
+        class="voltar"
+    >
+        Voltar para solicitações
+    </a>
+
+
+    <h1 class="page-heading">
+        Acompanhar Solicitação
+    </h1>
+
+
+    <div class="form-box">
+
+        <h2>
+            {{solicitacao.titulo}}
+        </h2>
+
+        <p>
+            {{solicitacao.descricao}}
+        </p>
+
+        <br>
+
+
+        <div class="card-grid">
+
+            <div class="info-card">
+
+                <h3>
+                    Status
+                </h3>
+
+                <p>
+
+                    <span class="status status-{{solicitacao.status}}">
+                        {{solicitacao.status}}
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    Etapa atual
+                </h3>
+
+                <p>
+                    {{solicitacao.etapa}}
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    Prioridade
+                </h3>
+
+                <p>
+                    {{solicitacao.prioridade}}
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    Solicitante
+                </h3>
+
+                <p>
+                    {{solicitacao.Usuario.nome}}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{#if solicitacao.motivoRejeicao}}
+
+        <div class="form-box">
+
+            <h2>
+                Motivo da rejeição
+            </h2>
+
+            <p>
+                {{solicitacao.motivoRejeicao}}
+            </p>
+
+        </div>
+
+    {{/if}}
+
+
+    {{#if isAdmin}}
+
+        <div class="form-box">
+
+            <h2>
+                Atualizar etapa
+            </h2>
+
+            <form
+                action="/solicitacoes/{{solicitacao.id}}/etapa"
+                method="POST"
+            >
+
+                <div class="form-group">
+
+                    <label for="etapa">
+                        Nova etapa
+                    </label>
+
+                    <select
+                        id="etapa"
+                        name="etapa"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione...
+                        </option>
+
+                        <option value="Aguardando análise">
+                            Em análise para compra
+                        </option>
+
+                        <option value="Em análise">
+                            Em processo de compra
+                        </option>
+
+                        <option value="Em andamento">
+                            Processo de entrega
+                        </option>
+
+                        <option value="Finalizada">
+                            Finalizada
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    Atualizar etapa
+                </button>
+
+            </form>
+
+        </div>
+
+    {{/if}}
+
+</main>
+
+</body>
+
+</html>
