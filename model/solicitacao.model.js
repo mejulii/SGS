@@ -6,23 +6,33 @@ const Solicitacao = sequelize.define('Solicitacao', {
     titulo: {
         type: DataTypes.STRING,
     },
+
     descricao: {
         type: DataTypes.TEXT,
     },
+
     prioridade: {
         type: DataTypes.STRING,
     },
+
     status: {
         type: DataTypes.STRING,
         defaultValue: 'pendente'
     },
+
     motivoRejeicao: {
         type: DataTypes.TEXT,
+    },
+
+    etapa: {
+        type: DataTypes.STRING,
+        defaultValue: 'Aguardando análise'
     }
 });
 
-// Cada solicitação pertence a um usuário (solicitante)
+// Cada solicitação pertence a um usuário
 Solicitacao.belongsTo(Usuario, { foreignKey: 'usuarioId' });
+
 Usuario.hasMany(Solicitacao, { foreignKey: 'usuarioId' });
 
 module.exports = Solicitacao;

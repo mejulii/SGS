@@ -1,146 +1,83 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <title>Solicitações</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: ghostwhite;
-        }
-
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 40px;
-        }
-
-        #divPrincipal {
-            width: 80%;
-            margin: 20px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px gray;
-            padding: 20px;
-        }
-
-      table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-
-th{
-    background: black;
-    color:white;
-    padding:14px;
-}
-
-td{
-    padding:12px;
-    border-bottom:1px solid #ddd;
-}
-
-tbody tr:nth-child(even){
-    background:#f8fafc;
-}
-
-tbody tr:hover{
-    background:#e0ecff;
-}
-
-.btn{
-    display:inline-block;
-    padding:10px 18px;
-    border-radius:8px;
-    text-decoration:none;
-    color:white;
-    font-weight:bold;
-    margin-right:10px;
-}
-
-.home{
-    background:#6b7280;
-}
-
-.novo{
-    background:#2563eb;
-}
-
-.editar{
-    background:#f59e0b;
-}
-
-.excluir{
-    background:#dc2626;
-}
-
-.status{
-    padding:5px 10px;
-    border-radius:5px;
-    color:white;
-    font-size:13px;
-    font-weight:bold;
-}
-
-.status-pendente{
-    background:#f59e0b;
-}
-
-.status-aprovada{
-    background:#16a34a;
-}
-
-.status-rejeitada{
-    background:#dc2626;
-}
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações - SGS</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Solicitações</h1>
+    <header class="site-header"><div class="container"><p class="site-title">Sistema de Gestão de Solicitações</p></div></header>
 
-    <div id="divPrincipal">
-        <a href="/" class="btn home">Home</a>
+    <main class="page-card">
+        <h1 class="page-heading">Solicitações</h1>
+    
+        <nav aria-label="Navegação principal" class="navigation">
+            <a href="/">Home</a>
+            <a href="/solicitacoes/cadastrar">Nova Solicitação</a>
+            <a href="/usuarios">Usuários</a>
+            <a href="/solicitacoes/aprovacao">Aprovação</a>
+        </nav>
 
-<a href="/solicitacoes/cadastrar" class="btn novo">
-Nova Solicitação
+        <div class="table-wrapper">
+            <table>
+                <caption>Lista de solicitações cadastradas</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Título</th>
+                        <th scope="col">Solicitante</th>
+                        <th scope="col">Prioridade</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each solicitacoes}}
+                    <tr>
+                        <td>{{titulo}}</td>
+                        <td>{{Usuario.nome}}</td>
+                        <td>{{prioridade}}</td>
+                        <td><span class="status status-{{status}}">{{status}}</span></td>
+                        <td>
+                            <div class="actions">
+   <a href="/solicitacoes/{{id}}/acompanhar"
+    class="btn-primary"
+    aria-label="Acompanhar solicitação {{titulo}}"
+>
+    Acompanhar
 </a>
 
-        <br><br>
+{{#ifEquals status "pendente"}}
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Solicitante</th>
-                    <th>Prioridade</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each solicitacoes}}
-                <tr>
-                    <td>{{titulo}}</td>
-                    <td>{{Usuario.nome}}</td>
-                    <td>{{prioridade}}</td>
-                    <td>
-                        <span class="status status-{{status}}">{{status}}</span>
-                    </td>
-                    <td>
-                        <a href="/solicitacoes/{{id}}/editar"
-class="btn editar">
-Editar
-</a>
+    {{#unless ../isAdmin}}
 
-<a href="/solicitacoes/{{id}}/excluir"
-class="btn excluir"
-onclick="return confirm('Deseja excluir esta solicitação?')">
-Excluir
-</a>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
+        <a
+            href="/solicitacoes/{{id}}/editar"
+            class="btn-secondary"
+            aria-label="Editar solicitação {{titulo}}"
+        >
+            Editar
+        </a>
+
+        <a
+            href="/solicitacoes/{{id}}/excluir"
+            class="btn-danger"
+            aria-label="Excluir solicitação {{titulo}}"
+            onclick="return confirm('Deseja excluir esta solicitação?')"
+        >
+            Excluir
+        </a>
+
+    {{/unless}}
+
+{{/ifEquals}}
+                            </div>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </main>
 </body>
 </html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SGS - Solicitante</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="container">
+
+        <p class="site-title">
+            Sistema de Gestão de Solicitações
+        </p>
+
+    </div>
+
+</header>
+
+
+<main class="page-card small">
+
+    <h1 class="page-heading">
+        Área do Solicitante
+    </h1>
+
+    <p>
+        Bem-vindo, {{usuario.nome}}.
+    </p>
+
+
+    <nav
+        aria-label="Menu do solicitante"
+        class="home-actions"
+    >
+
+        <a href="/solicitacoes">
+            Minhas Solicitações
+        </a>
+
+        <a href="/solicitacoes/cadastrar">
+            Nova Solicitação
+        </a>
+
+        <a href="/logout">
+            Sair
+        </a>
+
+    </nav>
+
+</main>
+
+</body>
+
+</html>

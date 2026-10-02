@@ -11,3 +11,4 @@ SET
     status = 'rejeitada',
     motivoRejeicao = 'Documentação incompleta'
 WHERE id = 1;
+

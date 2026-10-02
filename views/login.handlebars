@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - SGS</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <p class="site-title">
+            Sistema de Gestão de Solicitações
+        </p>
+    </div>
+</header>
+
+<main class="page-card small">
+
+    <h1 class="page-heading">
+        Acesso ao SGS
+    </h1>
+
+    {{#if erro}}
+
+        <div class="empty-state">
+            {{erro}}
+        </div>
+
+    {{/if}}
+
+    <div class="form-box">
+
+        <form action="/login" method="POST">
+
+            <div class="form-group">
+
+                <label for="email">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autocomplete="email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="senha">
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <div class="botoes-form">
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    Entrar
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+</body>
+
+</html>
