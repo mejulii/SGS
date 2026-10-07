@@ -1,6 +1,6 @@
 INSERT INTO usuarios (nome,email,senha,setor,tipo)
 VALUES
-('Amauri Clementino','amauri@gmail.com','123456','DAEE','Administrador'),
+('Amauri Clementino','amauri@gmail.com','123456','DAEE','administrador'),
 ('Sarah Silva','sarah@gmail.com','123456','Almoxarifado','solicitante');
 
 INSERT INTO solicitacoes

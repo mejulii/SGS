@@ -8,13 +8,14 @@ const Solicitacao = require('./model/solicitacao.model');
 
 const app = express();
 
-
 app.engine('handlebars', exphbs.engine({
     defaultLayout: false,
 
     helpers: {
         ifEquals: function (a, b, options) {
-            return a == b ? options.fn(this) : options.inverse(this);
+            return a == b
+                ? options.fn(this)
+                : options.inverse(this);
         }
     }
 }));
@@ -25,14 +26,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static('public'));
 
-
-
 app.use(session({
     secret: 'sgs-secret',
     resave: false,
     saveUninitialized: false
 }));
-
 
 function autenticado(req, res, next) {
 
@@ -42,7 +40,6 @@ function autenticado(req, res, next) {
 
     next();
 }
-
 
 function somenteAdmin(req, res, next) {
 
@@ -56,7 +53,6 @@ function somenteAdmin(req, res, next) {
 
     next();
 }
-
 
 function somenteSolicitante(req, res, next) {
 
@@ -80,8 +76,8 @@ app.get('/login', (req, res) => {
     res.render('login', {
         erro: null
     });
-});
 
+});
 
 app.post('/login', async (req, res) => {
 
@@ -103,12 +99,23 @@ app.post('/login', async (req, res) => {
 
     }
 
+    const tipo = String(usuario.tipo).trim().toLowerCase();
+
+    if (tipo !== 'administrador' && tipo !== 'solicitante') {
+
+        return res.render('login', {
+            erro: 'Tipo de usuário inválido.'
+        });
+
+    }
+
+    usuario.tipo = tipo;
+
     req.session.usuario = usuario;
 
     res.redirect('/');
+
 });
-
-
 
 app.get('/logout', (req, res) => {
 
@@ -118,25 +125,23 @@ app.get('/logout', (req, res) => {
 
 });
 
-
 app.get('/', autenticado, (req, res) => {
 
-    if (req.session.usuario.tipo === 'Administrador') {
+    const usuario = req.session.usuario;
+
+    if (usuario.tipo === 'administrador') {
 
         return res.render('homeAdmin', {
-            usuario: req.session.usuario
+            usuario: usuario
         });
 
     }
 
-    res.render('homeSolicitante', {
-        usuario: req.session.usuario
+    return res.render('homeSolicitante', {
+        usuario: usuario
     });
 
 });
-
-
-// LISTAR USUÁRIOS
 
 app.get('/usuarios', somenteAdmin, async (req, res) => {
 
@@ -151,17 +156,11 @@ app.get('/usuarios', somenteAdmin, async (req, res) => {
 
 });
 
-
-// FORMULÁRIO CADASTRAR
-
 app.get('/usuarios/cadastrar', somenteAdmin, (req, res) => {
 
     res.render('cadastrarUsuario');
 
 });
-
-
-// SALVAR NOVO USUÁRIO
 
 app.post('/usuarios', somenteAdmin, async (req, res) => {
 
@@ -178,23 +177,22 @@ app.post('/usuarios', somenteAdmin, async (req, res) => {
         email,
         senha,
         setor,
-        tipo
+        tipo: String(tipo).trim().toLowerCase()
     });
 
     res.redirect('/usuarios');
 
 });
 
-
-// FORMULÁRIO EDITAR
-
 app.get('/usuarios/:id/editar', somenteAdmin, async (req, res) => {
 
-    const id = req.params.id;
-
-    const usuario = await Usuario.findByPk(id, {
+    const usuario = await Usuario.findByPk(req.params.id, {
         raw: true
     });
+
+    if (!usuario) {
+        return res.redirect('/usuarios');
+    }
 
     res.render('editarUsuario', {
         usuario
@@ -202,12 +200,7 @@ app.get('/usuarios/:id/editar', somenteAdmin, async (req, res) => {
 
 });
 
-
-// SALVAR EDIÇÃO
-
 app.post('/usuarios/:id/editar', somenteAdmin, async (req, res) => {
-
-    const id = req.params.id;
 
     const {
         nome,
@@ -217,13 +210,17 @@ app.post('/usuarios/:id/editar', somenteAdmin, async (req, res) => {
         tipo
     } = req.body;
 
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(req.params.id);
+
+    if (!usuario) {
+        return res.redirect('/usuarios');
+    }
 
     usuario.nome = nome;
     usuario.email = email;
     usuario.senha = senha;
     usuario.setor = setor;
-    usuario.tipo = tipo;
+    usuario.tipo = String(tipo).trim().toLowerCase();
 
     await usuario.save();
 
@@ -231,14 +228,9 @@ app.post('/usuarios/:id/editar', somenteAdmin, async (req, res) => {
 
 });
 
-
-// EXCLUIR
-
 app.get('/usuarios/:id/excluir', somenteAdmin, async (req, res) => {
 
-    const id = req.params.id;
-
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(req.params.id);
 
     if (usuario) {
         await usuario.destroy();
@@ -248,19 +240,12 @@ app.get('/usuarios/:id/excluir', somenteAdmin, async (req, res) => {
 
 });
 
-
-// LISTAR SOLICITAÇÕES
-
 app.get('/solicitacoes', autenticado, async (req, res) => {
 
     let where = {};
 
-    // Solicitante vê somente as próprias solicitações
-
     if (req.session.usuario.tipo === 'solicitante') {
-
         where.usuarioId = req.session.usuario.id;
-
     }
 
     const solicitacoesRaw = await Solicitacao.findAll({
@@ -270,26 +255,24 @@ app.get('/solicitacoes', autenticado, async (req, res) => {
 
     const solicitacoes = solicitacoesRaw.map(s => s.toJSON());
 
+    const isAdmin =
+        req.session.usuario.tipo === 'administrador';
+
     res.render('listarSolicitacoes', {
         solicitacoes,
-        isAdmin: req.session.usuario.tipo === 'administrador'
+        isAdmin,
+        usuario: req.session.usuario
     });
 
 });
 
-
-// FORMULÁRIO CADASTRAR
-
-app.get('/solicitacoes/cadastrar', somenteSolicitante, async (req, res) => {
+app.get('/solicitacoes/cadastrar', somenteSolicitante, (req, res) => {
 
     res.render('cadastrarSolicitacao', {
         usuario: req.session.usuario
     });
 
 });
-
-
-// SALVAR NOVA SOLICITAÇÃO
 
 app.post('/solicitacoes', somenteSolicitante, async (req, res) => {
 
@@ -309,7 +292,7 @@ app.post('/solicitacoes', somenteSolicitante, async (req, res) => {
 
         status: 'pendente',
 
-        etapa: 'Aguardando análise'
+        etapa: null
 
     });
 
@@ -317,28 +300,22 @@ app.post('/solicitacoes', somenteSolicitante, async (req, res) => {
 
 });
 
-
-// FORMULÁRIO EDITAR
-
 app.get('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
 
-    const id = req.params.id;
-
-    const solicitacao = await Solicitacao.findByPk(id, {
-        raw: true
-    });
+    const solicitacao = await Solicitacao.findByPk(
+        req.params.id,
+        {
+            raw: true
+        }
+    );
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes');
     }
 
-    // Só pode editar a própria solicitação
-
     if (solicitacao.usuarioId !== req.session.usuario.id) {
         return res.redirect('/solicitacoes');
     }
-
-    // Só pode editar enquanto estiver pendente
 
     if (solicitacao.status !== 'pendente') {
         return res.redirect('/solicitacoes');
@@ -350,12 +327,7 @@ app.get('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
 
 });
 
-
-// SALVAR EDIÇÃO
-
 app.post('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
-
-    const id = req.params.id;
 
     const {
         titulo,
@@ -363,7 +335,7 @@ app.post('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
         prioridade
     } = req.body;
 
-    const solicitacao = await Solicitacao.findByPk(id);
+    const solicitacao = await Solicitacao.findByPk(req.params.id);
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes');
@@ -387,43 +359,57 @@ app.post('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
 
 });
 
+app.get('/solicitacoes/:id/excluir', autenticado, async (req, res) => {
 
-// EXCLUIR
-
-app.get('/solicitacoes/:id/excluir', somenteSolicitante, async (req, res) => {
-
-    const id = req.params.id;
-
-    const solicitacao = await Solicitacao.findByPk(id);
+    const solicitacao = await Solicitacao.findByPk(req.params.id);
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes');
     }
 
-    if (solicitacao.usuarioId !== req.session.usuario.id) {
+    if (req.session.usuario.tipo === 'administrador') {
+
+        if (
+            solicitacao.status !== 'aprovada' &&
+            solicitacao.status !== 'rejeitada'
+        ) {
+            return res.redirect('/solicitacoes');
+        }
+
+        await solicitacao.destroy();
+
         return res.redirect('/solicitacoes');
+
     }
 
-    if (solicitacao.status !== 'pendente') {
+    if (req.session.usuario.tipo === 'solicitante') {
+
+        if (solicitacao.usuarioId !== req.session.usuario.id) {
+            return res.redirect('/solicitacoes');
+        }
+
+        if (solicitacao.status !== 'pendente') {
+            return res.redirect('/solicitacoes');
+        }
+
+        await solicitacao.destroy();
+
         return res.redirect('/solicitacoes');
+
     }
 
-    await solicitacao.destroy();
-
-    res.redirect('/solicitacoes');
+    res.redirect('/');
 
 });
 
-
-// TELA DE ACOMPANHAMENTO
-
 app.get('/solicitacoes/:id/acompanhar', autenticado, async (req, res) => {
 
-    const id = req.params.id;
-
-    const solicitacaoRaw = await Solicitacao.findByPk(id, {
-        include: Usuario
-    });
+    const solicitacaoRaw = await Solicitacao.findByPk(
+        req.params.id,
+        {
+            include: Usuario
+        }
+    );
 
     if (!solicitacaoRaw) {
         return res.redirect('/solicitacoes');
@@ -431,61 +417,89 @@ app.get('/solicitacoes/:id/acompanhar', autenticado, async (req, res) => {
 
     const solicitacao = solicitacaoRaw.toJSON();
 
-    // Solicitante só pode acompanhar a própria solicitação
-
     if (
         req.session.usuario.tipo === 'solicitante' &&
         solicitacao.usuarioId !== req.session.usuario.id
     ) {
-
         return res.redirect('/solicitacoes');
-
     }
 
     res.render('acompanharSolicitacao', {
+
         solicitacao,
-        isAdmin: req.session.usuario.tipo === 'administrador'
+
+        isAdmin:
+            req.session.usuario.tipo === 'administrador'
+
     });
 
 });
 
-// Somente administrador pode mudar a etapa
 
+/*
+ * ATUALIZAR ETAPA
+ */
 app.post('/solicitacoes/:id/etapa', somenteAdmin, async (req, res) => {
 
-    const id = req.params.id;
-
-    const {
-        etapa
-    } = req.body;
-
-    const solicitacao = await Solicitacao.findByPk(id);
+    const solicitacao = await Solicitacao.findByPk(req.params.id);
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes');
     }
 
-    solicitacao.etapa = etapa;
+    if (solicitacao.status !== 'aprovada') {
+        return res.redirect(
+            '/solicitacoes/' +
+            req.params.id +
+            '/acompanhar'
+        );
+    }
+
+    const etapasPermitidas = [
+        'analise',
+        'compra',
+        'entrega',
+        'finalizada'
+    ];
+
+    if (!etapasPermitidas.includes(req.body.etapa)) {
+        return res.redirect(
+            '/solicitacoes/' +
+            req.params.id +
+            '/acompanhar'
+        );
+    }
+
+    solicitacao.etapa = req.body.etapa;
 
     await solicitacao.save();
 
-    res.redirect('/solicitacoes/' + id + '/acompanhar');
+    res.redirect(
+        '/solicitacoes/' +
+        req.params.id +
+        '/acompanhar'
+    );
 
 });
 
 
-// LISTAR SOLICITAÇÕES PENDENTES
-
+/*
+ * TELA DE APROVAÇÃO
+ */
 app.get('/solicitacoes/aprovacao', somenteAdmin, async (req, res) => {
 
     const solicitacoesRaw = await Solicitacao.findAll({
+
         where: {
             status: 'pendente'
         },
+
         include: Usuario
+
     });
 
-    const solicitacoes = solicitacoesRaw.map(s => s.toJSON());
+    const solicitacoes =
+        solicitacoesRaw.map(s => s.toJSON());
 
     res.render('aprovarSolicitacoes', {
         solicitacoes
@@ -494,64 +508,94 @@ app.get('/solicitacoes/aprovacao', somenteAdmin, async (req, res) => {
 });
 
 
-// APROVAR
-
+/*
+ * APROVAR SOLICITAÇÃO
+ */
 app.post('/solicitacoes/:id/aprovar', somenteAdmin, async (req, res) => {
 
-    const id = req.params.id;
-
-    const solicitacao = await Solicitacao.findByPk(id);
+    const solicitacao =
+        await Solicitacao.findByPk(req.params.id);
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes/aprovacao');
     }
 
+    if (solicitacao.status !== 'pendente') {
+        return res.redirect(
+            '/solicitacoes/' +
+            req.params.id +
+            '/acompanhar'
+        );
+    }
+
     solicitacao.status = 'aprovada';
 
-    solicitacao.etapa = 'Em análise';
+    solicitacao.etapa = 'analise';
 
     solicitacao.motivoRejeicao = null;
 
     await solicitacao.save();
 
-    res.redirect('/solicitacoes/aprovacao');
+    res.redirect(
+        '/solicitacoes/' +
+        req.params.id +
+        '/acompanhar'
+    );
 
 });
 
 
-// REJEITAR
-
+/*
+ * REJEITAR SOLICITAÇÃO
+ */
 app.post('/solicitacoes/:id/rejeitar', somenteAdmin, async (req, res) => {
 
-    const id = req.params.id;
-
-    const {
-        motivoRejeicao
-    } = req.body;
-
-    const solicitacao = await Solicitacao.findByPk(id);
+    const solicitacao =
+        await Solicitacao.findByPk(req.params.id);
 
     if (!solicitacao) {
         return res.redirect('/solicitacoes/aprovacao');
     }
 
+    if (solicitacao.status !== 'pendente') {
+        return res.redirect(
+            '/solicitacoes/' +
+            req.params.id +
+            '/acompanhar'
+        );
+    }
+
+    const motivoRejeicao =
+        String(req.body.motivoRejeicao || '').trim();
+
+    if (!motivoRejeicao) {
+        return res.redirect(
+            '/solicitacoes/' +
+            req.params.id +
+            '/acompanhar'
+        );
+    }
+
     solicitacao.status = 'rejeitada';
 
-    solicitacao.etapa = 'Solicitação rejeitada';
+    solicitacao.etapa = 'rejeitada';
 
     solicitacao.motivoRejeicao = motivoRejeicao;
 
     await solicitacao.save();
 
-    res.redirect('/solicitacoes/aprovacao');
+    res.redirect(
+        '/solicitacoes/' +
+        req.params.id +
+        '/acompanhar'
+    );
 
 });
 
+
 async function iniciar() {
 
-    await sequelize.sync({
-        alter: true
-    });
+    await sequelize.sync();
 
     console.log('Banco de dados conectado!');
 

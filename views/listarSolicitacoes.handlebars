@@ -1,83 +1,235 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitações - SGS</title>
-    <link rel="stylesheet" href="/css/style.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Solicitações - SGS
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
 </head>
+
 <body>
-    <header class="site-header"><div class="container"><p class="site-title">Sistema de Gestão de Solicitações</p></div></header>
 
-    <main class="page-card">
-        <h1 class="page-heading">Solicitações</h1>
-    
-        <nav aria-label="Navegação principal" class="navigation">
-            <a href="/">Home</a>
-            <a href="/solicitacoes/cadastrar">Nova Solicitação</a>
-            <a href="/usuarios">Usuários</a>
-            <a href="/solicitacoes/aprovacao">Aprovação</a>
-        </nav>
+<header class="site-header">
 
-        <div class="table-wrapper">
-            <table>
-                <caption>Lista de solicitações cadastradas</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Título</th>
-                        <th scope="col">Solicitante</th>
-                        <th scope="col">Prioridade</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each solicitacoes}}
-                    <tr>
-                        <td>{{titulo}}</td>
-                        <td>{{Usuario.nome}}</td>
-                        <td>{{prioridade}}</td>
-                        <td><span class="status status-{{status}}">{{status}}</span></td>
-                        <td>
-                            <div class="actions">
-   <a href="/solicitacoes/{{id}}/acompanhar"
-    class="btn-primary"
-    aria-label="Acompanhar solicitação {{titulo}}"
->
-    Acompanhar
-</a>
+    <div class="container">
 
-{{#ifEquals status "pendente"}}
+        <p class="site-title">
+            Sistema de Gestão de Solicitações
+        </p>
 
-    {{#unless ../isAdmin}}
+    </div>
 
-        <a
-            href="/solicitacoes/{{id}}/editar"
-            class="btn-secondary"
-            aria-label="Editar solicitação {{titulo}}"
-        >
-            Editar
+</header>
+
+<main class="page-card">
+
+    <h1 class="page-heading">
+        Solicitações
+    </h1>
+
+    <nav
+        aria-label="Navegação principal"
+        class="navigation"
+    >
+
+        <a href="/">
+            Home
         </a>
 
-        <a
-            href="/solicitacoes/{{id}}/excluir"
-            class="btn-danger"
-            aria-label="Excluir solicitação {{titulo}}"
-            onclick="return confirm('Deseja excluir esta solicitação?')"
-        >
-            Excluir
-        </a>
+        {{#if isAdmin}}
 
-    {{/unless}}
+            <a href="/usuarios">
+                Usuários
+            </a>
 
-{{/ifEquals}}
-                            </div>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-    </main>
+            <a href="/solicitacoes/aprovacao">
+                Aprovação
+            </a>
+
+        {{else}}
+
+            <a href="/solicitacoes/cadastrar">
+                Nova Solicitação
+            </a>
+
+        {{/if}}
+
+    </nav>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <caption>
+                Lista de solicitações cadastradas
+            </caption>
+
+            <thead>
+
+                <tr>
+
+                    <th scope="col">
+                        Título
+                    </th>
+
+                    <th scope="col">
+                        Solicitante
+                    </th>
+
+                    <th scope="col">
+                        Prioridade
+                    </th>
+
+                    <th scope="col">
+                        Status
+                    </th>
+
+                    <th scope="col">
+                        Ações
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {{#each solicitacoes}}
+
+                <tr>
+
+                    <td>
+                        {{titulo}}
+                    </td>
+
+                    <td>
+                        {{Usuario.nome}}
+                    </td>
+
+                    <td>
+                        {{prioridade}}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status status-{{status}}"
+                        >
+                            {{status}}
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            {{#if ../isAdmin}}
+
+                                {{#ifEquals status "pendente"}}
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/acompanhar"
+                                        class="btn-primary"
+                                    >
+                                        Ver solicitação
+                                    </a>
+
+                                {{else}}
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/acompanhar"
+                                        class="btn-primary"
+                                    >
+                                        Acompanhar
+                                    </a>
+
+                                {{/ifEquals}}
+
+                                {{#ifEquals status "aprovada"}}
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/excluir"
+                                        class="btn-danger"
+                                        onclick="return confirm('Deseja excluir esta solicitação resolvida?')"
+                                    >
+                                        Excluir
+                                    </a>
+
+                                {{/ifEquals}}
+
+                                {{#ifEquals status "rejeitada"}}
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/excluir"
+                                        class="btn-danger"
+                                        onclick="return confirm('Deseja excluir esta solicitação resolvida?')"
+                                    >
+                                        Excluir
+                                    </a>
+
+                                {{/ifEquals}}
+
+                            {{else}}
+
+                                <a
+                                    href="/solicitacoes/{{id}}/acompanhar"
+                                    class="btn-primary"
+                                >
+                                    Acompanhar
+                                </a>
+
+                                {{#ifEquals status "pendente"}}
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/editar"
+                                        class="btn-secondary"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <a
+                                        href="/solicitacoes/{{id}}/excluir"
+                                        class="btn-danger"
+                                        onclick="return confirm('Deseja excluir esta solicitação?')"
+                                    >
+                                        Excluir
+                                    </a>
+
+                                {{/ifEquals}}
+
+                            {{/if}}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {{/each}}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
 </body>
+
 </html>
