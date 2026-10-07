@@ -1,52 +1,161 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Solicitação - SGS</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <header class="site-header"><div class="container"><p class="site-title">Sistema de Gestão de Solicitações</p></div></header>
 
-    <main class="page-card medium">
-        <a href="/solicitacoes" class="voltar">Voltar para solicitações</a>
-        <h1 class="page-heading">Editar Solicitação</h1>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Editar Solicitação - SGS
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="container">
+
+        <p class="site-title">
+            Sistema de Gestão de Solicitações
+        </p>
+
+    </div>
+
+</header>
+
+<main class="page-card medium">
+
+    <a
+        href="/solicitacoes"
+        class="voltar"
+    >
+        Voltar para solicitações
+    </a>
+
+    <h1 class="page-heading">
+        Editar Solicitação
+    </h1>
+
+    <form
+        action="/solicitacoes/{{solicitacao.id}}/editar"
+        method="POST"
+    >
 
         <div class="form-box">
-            <form action="/solicitacoes/{{solicitacao.id}}/editar" method="POST">
-                <div class="form-group">
-                    <label for="iptTitulo">Título</label>
-                    <input type="text" id="iptTitulo" name="titulo" value="{{solicitacao.titulo}}" autocomplete="off" required>
-                </div>
-                <div class="form-group">
-                    <label for="iptDescricao">Descrição</label>
-                    <textarea id="iptDescricao" name="descricao" required>{{solicitacao.descricao}}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="iptUsuario">Solicitante</label>
-                    <select id="iptUsuario" name="usuarioId" required>
-                        <option value="">Selecione...</option>
-                        {{#each usuarios}}
-                        <option value="{{id}}" {{#ifEquals id ../solicitacao.usuarioId}}selected{{/ifEquals}}>{{nome}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="iptPrioridade">Prioridade</label>
-                    <select id="iptPrioridade" name="prioridade" required>
-                        <option value="">Selecione...</option>
-                        <option value="baixa" {{#ifEquals solicitacao.prioridade "baixa"}}selected{{/ifEquals}}>Baixa</option>
-                        <option value="media" {{#ifEquals solicitacao.prioridade "media"}}selected{{/ifEquals}}>Média</option>
-                        <option value="alta" {{#ifEquals solicitacao.prioridade "alta"}}selected{{/ifEquals}}>Alta</option>
-                    </select>
-                </div>
-                <div class="botoes-form">
-                    <a href="/solicitacoes" class="btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn-primary">Salvar alterações</button>
-                </div>
-            </form>
+
+            <div class="form-group">
+
+                <label for="titulo">
+                    Título
+                </label>
+
+                <input
+                    type="text"
+                    id="titulo"
+                    name="titulo"
+                    value="{{solicitacao.titulo}}"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="descricao">
+                    Descrição
+                </label>
+
+                <textarea
+                    id="descricao"
+                    name="descricao"
+                    required
+                >{{solicitacao.descricao}}</textarea>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="prioridade">
+                    Prioridade
+                </label>
+
+                <select
+                    id="prioridade"
+                    name="prioridade"
+                    required
+                >
+
+                    <option value="">
+                        Selecione...
+                    </option>
+
+                    <option
+                        value="Baixa"
+                        {{#ifEquals solicitacao.prioridade "Baixa"}}
+                            selected
+                        {{/ifEquals}}
+                    >
+                        Baixa
+                    </option>
+
+                    <option
+                        value="Média"
+                        {{#ifEquals solicitacao.prioridade "Média"}}
+                            selected
+                        {{/ifEquals}}
+                    >
+                        Média
+                    </option>
+
+                    <option
+                        value="Alta"
+                        {{#ifEquals solicitacao.prioridade "Alta"}}
+                            selected
+                        {{/ifEquals}}
+                    >
+                        Alta
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="actions">
+
+                <a
+                    href="/solicitacoes"
+                    class="btn-secondary"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    Salvar alterações
+                </button>
+
+            </div>
+
         </div>
-    </main>
+
+    </form>
+
+</main>
+
 </body>
+
 </html>

@@ -14,7 +14,10 @@
         Acompanhar Solicitação - SGS
     </title>
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
 
 </head>
 
@@ -32,7 +35,6 @@
 
 </header>
 
-
 <main class="page-card medium">
 
     <a
@@ -42,11 +44,9 @@
         Voltar para solicitações
     </a>
 
-
     <h1 class="page-heading">
         Acompanhar Solicitação
     </h1>
-
 
     <div class="form-box">
 
@@ -60,7 +60,6 @@
 
         <br>
 
-
         <div class="card-grid">
 
             <div class="info-card">
@@ -71,7 +70,9 @@
 
                 <p>
 
-                    <span class="status status-{{solicitacao.status}}">
+                    <span
+                        class="status status-{{solicitacao.status}}"
+                    >
                         {{solicitacao.status}}
                     </span>
 
@@ -79,19 +80,77 @@
 
             </div>
 
-
             <div class="info-card">
 
                 <h3>
                     Etapa atual
                 </h3>
 
-                <p>
-                    {{solicitacao.etapa}}
-                </p>
+                {{#ifEquals solicitacao.status "pendente"}}
+
+                    <p>
+                        Ainda não iniciada
+                    </p>
+
+                {{else}}
+
+                    {{#ifEquals solicitacao.etapa "analise"}}
+
+                        <p>
+                            Em análise para compra
+                        </p>
+
+                    {{else}}
+
+                        {{#ifEquals solicitacao.etapa "compra"}}
+
+                            <p>
+                                Em processo de compra
+                            </p>
+
+                        {{else}}
+
+                            {{#ifEquals solicitacao.etapa "entrega"}}
+
+                                <p>
+                                    Processo de entrega
+                                </p>
+
+                            {{else}}
+
+                                {{#ifEquals solicitacao.etapa "finalizada"}}
+
+                                    <p>
+                                        Finalizada
+                                    </p>
+
+                                {{else}}
+
+                                    {{#ifEquals solicitacao.status "rejeitada"}}
+
+                                        <p>
+                                            Solicitação rejeitada
+                                        </p>
+
+                                    {{else}}
+
+                                        <p>
+                                            Ainda não iniciada
+                                        </p>
+
+                                    {{/ifEquals}}
+
+                                {{/ifEquals}}
+
+                            {{/ifEquals}}
+
+                        {{/ifEquals}}
+
+                    {{/ifEquals}}
+
+                {{/ifEquals}}
 
             </div>
-
 
             <div class="info-card">
 
@@ -104,7 +163,6 @@
                 </p>
 
             </div>
-
 
             <div class="info-card">
 
@@ -140,68 +198,145 @@
     {{/if}}
 
 
-    {{#if isAdmin}}
+    {{#ifEquals solicitacao.status "pendente"}}
 
-        <div class="form-box">
+        {{#if isAdmin}}
 
-            <h2>
-                Atualizar etapa
-            </h2>
+            <div class="form-box">
 
-            <form
-                action="/solicitacoes/{{solicitacao.id}}/etapa"
-                method="POST"
-            >
+                <h3>
+                    Decisão da solicitação
+                </h3>
 
-                <div class="form-group">
+                <p>
+                    Analise as informações acima antes de decidir se a solicitação será aprovada ou rejeitada.
+                </p>
 
-                    <label for="etapa">
-                        Nova etapa
-                    </label>
+                <br>
 
-                    <select
-                        id="etapa"
-                        name="etapa"
-                        required
+                <div class="actions">
+
+                    <form
+                        action="/solicitacoes/{{solicitacao.id}}/aprovar"
+                        method="POST"
+                        onsubmit="return confirm('Deseja aprovar esta solicitação?')"
                     >
 
-                        <option value="">
-                            Selecione...
-                        </option>
+                        <button
+                            type="submit"
+                            class="btn-success"
+                        >
+                            Aprovar
+                        </button>
 
-                        <option value="Aguardando análise">
-                            Em análise para compra
-                        </option>
+                    </form>
 
-                        <option value="Em análise">
-                            Em processo de compra
-                        </option>
 
-                        <option value="Em andamento">
-                            Processo de entrega
-                        </option>
+                    <form
+                        action="/solicitacoes/{{solicitacao.id}}/rejeitar"
+                        method="POST"
+                        onsubmit="return confirm('Deseja rejeitar esta solicitação?')"
+                    >
 
-                        <option value="Finalizada">
-                            Finalizada
-                        </option>
+                        <div class="form-group">
 
-                    </select>
+                            <label for="motivoRejeicao">
+                                Motivo da rejeição
+                            </label>
+
+                            <textarea
+                                id="motivoRejeicao"
+                                name="motivoRejeicao"
+                                rows="4"
+                                placeholder="Informe obrigatoriamente o motivo da rejeição."
+                                required
+                            ></textarea>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-danger"
+                        >
+                            Rejeitar
+                        </button>
+
+                    </form>
 
                 </div>
 
+            </div>
 
-                <button
-                    type="submit"
-                    class="btn-primary"
-                >
+        {{/if}}
+
+    {{/ifEquals}}
+
+
+    {{#ifEquals solicitacao.status "aprovada"}}
+
+        {{#if isAdmin}}
+
+            <div class="form-box">
+
+                <h3>
                     Atualizar etapa
-                </button>
+                </h3>
 
-            </form>
+                <form
+                    action="/solicitacoes/{{solicitacao.id}}/etapa"
+                    method="POST"
+                >
 
-        </div>
+                    <div class="form-group">
 
-    {{/if}}
+                        <label for="etapa">
+                            Nova etapa
+                        </label>
+
+                        <select
+                            id="etapa"
+                            name="etapa"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione...
+                            </option>
+
+                            <option value="analise">
+                                Em análise para compra
+                            </option>
+
+                            <option value="compra">
+                                Em processo de compra
+                            </option>
+
+                            <option value="entrega">
+                                Processo de entrega
+                            </option>
+
+                            <option value="finalizada">
+                                Finalizada
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Atualizar etapa
+                    </button>
+
+                </form>
+
+            </div>
+
+        {{/if}}
+
+    {{/ifEquals}}
 
 </main>
 

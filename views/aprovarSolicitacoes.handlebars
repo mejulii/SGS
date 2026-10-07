@@ -6,60 +6,114 @@
     <title>Aprovação de Solicitações - SGS</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-    <header class="site-header"><div class="container"><p class="site-title">Sistema de Gestão de Solicitações</p></div></header>
 
-    <main class="page-card">
-        <h1 class="page-heading">Aprovação de Solicitações</h1>
+<header class="site-header">
+    <div class="container">
+        <p class="site-title">Sistema de Gestão de Solicitações</p>
+    </div>
+</header>
 
-        <nav aria-label="Navegação principal" class="navigation">
-            <a href="/">Home</a>
-            <a href="/usuarios">Usuários</a>
-            <a href="/solicitacoes">Solicitações</a>
-        </nav>
+<main class="page-card">
 
-        {{#if solicitacoes}}
-        <div class="table-wrapper">
-            <table>
-                <caption>Solicitações pendentes de aprovação</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Título</th>
-                        <th scope="col">Descrição</th>
-                        <th scope="col">Solicitante</th>
-                        <th scope="col">Prioridade</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each solicitacoes}}
-                    <tr>
-                        <td>{{titulo}}</td>
-                        <td>{{descricao}}</td>
-                        <td>{{Usuario.nome}}</td>
-                        <td>{{prioridade}}</td>
-                        <td><span class="status status-{{status}}">{{status}}</span></td>
-                        <td>
-                            <div class="actions">
-                                <form action="/solicitacoes/{{id}}/aprovar" method="POST" onsubmit="return confirm('Confirma a aprovação desta solicitação?')">
-                                    <button type="submit" class="btn-success">Aprovar</button>
-                                </form>
-                                <form action="/solicitacoes/{{id}}/rejeitar" method="POST" onsubmit="return confirm('Confirma a rejeição desta solicitação?')">
-                                    <label for="motivo-{{id}}">Motivo da rejeição (obrigatório)</label>
-                                    <textarea id="motivo-{{id}}" name="motivoRejeicao" rows="3" placeholder="Informe o motivo da rejeição."required></textarea>
-                                    <button type="submit" class="btn-danger">Rejeitar</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-        {{else}}
-        <p class="empty-state">Não há solicitações pendentes.</p>
-        {{/if}}
-    </main>
+    <h1 class="page-heading">
+        Aprovação de Solicitações
+    </h1>
+
+    <nav aria-label="Navegação principal" class="navigation">
+        <a href="/">Home</a>
+        <a href="/usuarios">Usuários</a>
+        <a href="/solicitacoes">Solicitações</a>
+    </nav>
+
+    {{#if solicitacoes}}
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <caption>
+                Solicitações pendentes de aprovação
+            </caption>
+
+            <thead>
+
+                <tr>
+                    <th scope="col">Título</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Solicitante</th>
+                    <th scope="col">Prioridade</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ações</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {{#each solicitacoes}}
+
+                <tr>
+
+                    <td>
+                        {{titulo}}
+                    </td>
+
+                    <td>
+                        {{descricao}}
+                    </td>
+
+                    <td>
+                        {{Usuario.nome}}
+                    </td>
+
+                    <td>
+                        {{prioridade}}
+                    </td>
+
+                    <td>
+
+                        <span class="status status-{{status}}">
+                            {{status}}
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="/solicitacoes/{{id}}/acompanhar"
+                                class="btn-primary"
+                            >
+                                Ver solicitação
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {{/each}}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {{else}}
+
+        <p class="empty-state">
+            Não há solicitações pendentes.
+        </p>
+
+    {{/if}}
+
+</main>
+
 </body>
 </html>
