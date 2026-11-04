@@ -1,235 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Solicitações - SGS
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="/css/style.css"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações - SGS</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-
 <body>
 
 <header class="site-header">
-
     <div class="container">
-
-        <p class="site-title">
-            Sistema de Gestão de Solicitações
-        </p>
-
+        <p class="site-title">Sistema de Gestão de Solicitações</p>
     </div>
-
 </header>
 
 <main class="page-card">
 
-    <h1 class="page-heading">
-        Solicitações
-    </h1>
+    <h1 class="page-heading">Solicitações</h1>
 
-    <nav
-        aria-label="Navegação principal"
-        class="navigation"
-    >
-
-        <a href="/">
-            Home
-        </a>
+    <nav aria-label="Navegação principal" class="navigation">
+        <a href="/">Home</a>
 
         {{#if isAdmin}}
-
-            <a href="/usuarios">
-                Usuários
-            </a>
-
-            <a href="/solicitacoes/aprovacao">
-                Aprovação
-            </a>
-
+            <a href="/usuarios">Usuários</a>
+            <a href="/solicitacoes/aprovacao">Aprovação</a>
         {{else}}
-
-            <a href="/solicitacoes/cadastrar">
-                Nova Solicitação
-            </a>
-
+            <a href="/solicitacoes/cadastrar">Nova Solicitação</a>
         {{/if}}
-
     </nav>
 
+    {{#if isAdmin}}
+    <form method="GET" action="/solicitacoes" class="filtros" role="search" aria-label="Filtrar solicitações">
+
+        <div class="form-group">
+            <label for="busca">Pesquisar</label>
+            <input
+                type="search"
+                id="busca"
+                name="busca"
+                value="{{filtros.busca}}"
+                placeholder="Título ou solicitante"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="">Todos</option>
+                <option value="pendente" {{#ifEquals filtros.status "pendente"}}selected{{/ifEquals}}>Pendente</option>
+                <option value="aprovada" {{#ifEquals filtros.status "aprovada"}}selected{{/ifEquals}}>Aprovada</option>
+                <option value="rejeitada" {{#ifEquals filtros.status "rejeitada"}}selected{{/ifEquals}}>Rejeitada</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="prioridade">Prioridade</label>
+            <select id="prioridade" name="prioridade">
+                <option value="">Todas</option>
+                <option value="baixa" {{#ifEquals filtros.prioridade "baixa"}}selected{{/ifEquals}}>Baixa</option>
+                <option value="media" {{#ifEquals filtros.prioridade "media"}}selected{{/ifEquals}}>Média</option>
+                <option value="alta" {{#ifEquals filtros.prioridade "alta"}}selected{{/ifEquals}}>Alta</option>
+            </select>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="/solicitacoes" class="btn-secondary">Limpar filtros</a>
+        </div>
+
+    </form>
+
+    {{#if filtrado}}
+        <p>Exibindo {{solicitacoes.length}} resultado(s) para o filtro aplicado.</p>
+    {{/if}}
+    {{/if}}
+
+    {{#if solicitacoes}}
     <div class="table-wrapper">
-
         <table>
-
-            <caption>
-                Lista de solicitações cadastradas
-            </caption>
-
+            <caption>Lista de solicitações cadastradas</caption>
             <thead>
-
                 <tr>
-
-                    <th scope="col">
-                        Título
-                    </th>
-
-                    <th scope="col">
-                        Solicitante
-                    </th>
-
-                    <th scope="col">
-                        Prioridade
-                    </th>
-
-                    <th scope="col">
-                        Status
-                    </th>
-
-                    <th scope="col">
-                        Ações
-                    </th>
-
+                    <th scope="col">Título</th>
+                    <th scope="col">Solicitante</th>
+                    <th scope="col">Prioridade</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ações</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
                 {{#each solicitacoes}}
-
                 <tr>
-
+                    <td>{{titulo}}</td>
+                    <td>{{Usuario.nome}}</td>
+                    <td>{{prioridade}}</td>
                     <td>
-                        {{titulo}}
+                        <span class="status status-{{status}}">{{status}}</span>
                     </td>
-
                     <td>
-                        {{Usuario.nome}}
-                    </td>
-
-                    <td>
-                        {{prioridade}}
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status status-{{status}}"
-                        >
-                            {{status}}
-                        </span>
-
-                    </td>
-
-                    <td>
-
                         <div class="actions">
 
                             {{#if ../isAdmin}}
 
                                 {{#ifEquals status "pendente"}}
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/acompanhar"
-                                        class="btn-primary"
-                                    >
-                                        Ver solicitação
-                                    </a>
-
+                                    <a href="/solicitacoes/{{id}}/acompanhar" class="btn-primary">Ver solicitação</a>
                                 {{else}}
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/acompanhar"
-                                        class="btn-primary"
-                                    >
-                                        Acompanhar
-                                    </a>
-
+                                    <a href="/solicitacoes/{{id}}/acompanhar" class="btn-primary">Acompanhar</a>
                                 {{/ifEquals}}
 
                                 {{#ifEquals status "aprovada"}}
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/excluir"
-                                        class="btn-danger"
-                                        onclick="return confirm('Deseja excluir esta solicitação resolvida?')"
-                                    >
-                                        Excluir
-                                    </a>
-
+                                    <a href="/solicitacoes/{{id}}/excluir" class="btn-danger" onclick="return confirm('Deseja excluir esta solicitação resolvida?')">Excluir</a>
                                 {{/ifEquals}}
 
                                 {{#ifEquals status "rejeitada"}}
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/excluir"
-                                        class="btn-danger"
-                                        onclick="return confirm('Deseja excluir esta solicitação resolvida?')"
-                                    >
-                                        Excluir
-                                    </a>
-
+                                    <a href="/solicitacoes/{{id}}/excluir" class="btn-danger" onclick="return confirm('Deseja excluir esta solicitação resolvida?')">Excluir</a>
                                 {{/ifEquals}}
 
                             {{else}}
 
-                                <a
-                                    href="/solicitacoes/{{id}}/acompanhar"
-                                    class="btn-primary"
-                                >
-                                    Acompanhar
-                                </a>
+                                <a href="/solicitacoes/{{id}}/acompanhar" class="btn-primary">Acompanhar</a>
 
                                 {{#ifEquals status "pendente"}}
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/editar"
-                                        class="btn-secondary"
-                                    >
-                                        Editar
-                                    </a>
-
-                                    <a
-                                        href="/solicitacoes/{{id}}/excluir"
-                                        class="btn-danger"
-                                        onclick="return confirm('Deseja excluir esta solicitação?')"
-                                    >
-                                        Excluir
-                                    </a>
-
+                                    <a href="/solicitacoes/{{id}}/editar" class="btn-secondary">Editar</a>
+                                    <a href="/solicitacoes/{{id}}/excluir" class="btn-danger" onclick="return confirm('Deseja excluir esta solicitação?')">Excluir</a>
                                 {{/ifEquals}}
 
                             {{/if}}
 
                         </div>
-
                     </td>
-
                 </tr>
-
                 {{/each}}
-
             </tbody>
-
         </table>
-
     </div>
+    {{else}}
+        <p class="empty-state">Nenhuma solicitação encontrada.</p>
+    {{/if}}
 
 </main>
 
 </body>
-
 </html>

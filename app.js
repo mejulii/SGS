@@ -8,6 +8,8 @@ const Solicitacao = require('./model/solicitacao.model');
 
 const app = express();
 
+const { Op } = require('sequelize');
+
 app.engine('handlebars', exphbs.engine({
     defaultLayout: false,
 
@@ -242,10 +244,47 @@ app.get('/usuarios/:id/excluir', somenteAdmin, async (req, res) => {
 
 app.get('/solicitacoes', autenticado, async (req, res) => {
 
+    const isAdmin = req.session.usuario.tipo === 'administrador';
+
     let where = {};
 
-    if (req.session.usuario.tipo === 'solicitante') {
+    // Solicitante vê somente as próprias solicitações
+    if (!isAdmin) {
         where.usuarioId = req.session.usuario.id;
+    }
+
+    const filtros = {
+        status: '',
+        prioridade: '',
+        busca: ''
+    };
+
+    // Filtros valem só para o administrador
+    if (isAdmin) {
+
+        const statusValidos = ['pendente', 'aprovada', 'rejeitada'];
+        const prioridadesValidas = ['baixa', 'media', 'alta'];
+
+        if (statusValidos.includes(req.query.status)) {
+            filtros.status = req.query.status;
+            where.status = filtros.status;
+        }
+
+        if (prioridadesValidas.includes(req.query.prioridade)) {
+            filtros.prioridade = req.query.prioridade;
+            where.prioridade = filtros.prioridade;
+        }
+
+        const busca = String(req.query.busca || '').trim();
+
+        if (busca) {
+            filtros.busca = busca;
+
+            where[Op.or] = [
+                { titulo: { [Op.like]: '%' + busca + '%' } },
+                { '$Usuario.nome$': { [Op.like]: '%' + busca + '%' } }
+            ];
+        }
     }
 
     const solicitacoesRaw = await Solicitacao.findAll({
@@ -255,13 +294,12 @@ app.get('/solicitacoes', autenticado, async (req, res) => {
 
     const solicitacoes = solicitacoesRaw.map(s => s.toJSON());
 
-    const isAdmin =
-        req.session.usuario.tipo === 'administrador';
-
     res.render('listarSolicitacoes', {
         solicitacoes,
         isAdmin,
-        usuario: req.session.usuario
+        usuario: req.session.usuario,
+        filtros,
+        filtrado: Boolean(filtros.status || filtros.prioridade || filtros.busca)
     });
 
 });
@@ -436,9 +474,7 @@ app.get('/solicitacoes/:id/acompanhar', autenticado, async (req, res) => {
 });
 
 
-/*
- * ATUALIZAR ETAPA
- */
+
 app.post('/solicitacoes/:id/etapa', somenteAdmin, async (req, res) => {
 
     const solicitacao = await Solicitacao.findByPk(req.params.id);
@@ -483,9 +519,7 @@ app.post('/solicitacoes/:id/etapa', somenteAdmin, async (req, res) => {
 });
 
 
-/*
- * TELA DE APROVAÇÃO
- */
+
 app.get('/solicitacoes/aprovacao', somenteAdmin, async (req, res) => {
 
     const solicitacoesRaw = await Solicitacao.findAll({
@@ -508,9 +542,7 @@ app.get('/solicitacoes/aprovacao', somenteAdmin, async (req, res) => {
 });
 
 
-/*
- * APROVAR SOLICITAÇÃO
- */
+
 app.post('/solicitacoes/:id/aprovar', somenteAdmin, async (req, res) => {
 
     const solicitacao =
@@ -545,9 +577,7 @@ app.post('/solicitacoes/:id/aprovar', somenteAdmin, async (req, res) => {
 });
 
 
-/*
- * REJEITAR SOLICITAÇÃO
- */
+
 app.post('/solicitacoes/:id/rejeitar', somenteAdmin, async (req, res) => {
 
     const solicitacao =
@@ -596,6 +626,22 @@ app.post('/solicitacoes/:id/rejeitar', somenteAdmin, async (req, res) => {
 async function iniciar() {
 
     await sequelize.sync();
+
+
+    await Solicitacao.update(
+        { etapa: 'analise' },
+        {
+            where: {
+                status: 'aprovada',
+                etapa: { [Op.or]: [null, 'Em andamento', 'Aguardando análise'] }
+            }
+        }
+    );
+
+  
+    await Solicitacao.update({ prioridade: 'media' }, { where: { prioridade: 'Média' } });
+    await Solicitacao.update({ prioridade: 'alta' }, { where: { prioridade: 'Alta' } });
+    await Solicitacao.update({ prioridade: 'baixa' }, { where: { prioridade: 'Baixa' } });
 
     console.log('Banco de dados conectado!');
 
