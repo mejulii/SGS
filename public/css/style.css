@@ -278,3 +278,15 @@ a[aria-disabled="true"] { cursor: not-allowed; }
     .actions a,
     .actions button { width: 100%; }
 }
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.filtros .form-group {
+    margin-bottom: 0;
+}
