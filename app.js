@@ -5,6 +5,7 @@ const session = require('express-session');
 const sequelize = require('./config/bd');
 const Usuario = require('./model/usuario.model');
 const Solicitacao = require('./model/solicitacao.model');
+const Historico = require('./model/historico.model');
 
 const app = express();
 
@@ -18,6 +19,25 @@ app.engine('handlebars', exphbs.engine({
             return a == b
                 ? options.fn(this)
                 : options.inverse(this);
+        },
+
+        formatDate: function (data) {
+
+            if (!data) {
+                return '-';
+            }
+
+            const d = new Date(data);
+
+            if (isNaN(d.getTime())) {
+                return '-';
+            }
+
+            return d.toLocaleString('pt-BR', {
+                timeZone: 'America/Recife',
+                dateStyle: 'short',
+                timeStyle: 'medium'
+            }).replace(', ', ' ');
         }
     }
 }));
@@ -33,6 +53,30 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+const NOMES_ETAPAS = {
+    analise: 'Em análise para compra',
+    compra: 'Em processo de compra',
+    entrega: 'Processo de entrega',
+    finalizada: 'Finalizada'
+};
+
+const NOMES_PRIORIDADES = {
+    baixa: 'baixa',
+    media: 'média',
+    alta: 'alta'
+};
+
+async function registrarHistorico(solicitacaoId, evento, descricao, usuario) {
+
+    await Historico.create({
+        solicitacaoId: solicitacaoId,
+        evento: evento,
+        descricao: descricao,
+        responsavel: usuario ? usuario.nome : null
+    });
+
+}
 
 function autenticado(req, res, next) {
 
@@ -320,7 +364,7 @@ app.post('/solicitacoes', somenteSolicitante, async (req, res) => {
         prioridade
     } = req.body;
 
-    await Solicitacao.create({
+    const nova = await Solicitacao.create({
 
         titulo,
         descricao,
@@ -333,6 +377,14 @@ app.post('/solicitacoes', somenteSolicitante, async (req, res) => {
         etapa: null
 
     });
+
+    await registrarHistorico(
+        nova.id,
+        'Criação',
+        'Solicitação criada com prioridade ' +
+            (NOMES_PRIORIDADES[prioridade] || prioridade) + '.',
+        req.session.usuario
+    );
 
     res.redirect('/solicitacoes');
 
@@ -387,11 +439,36 @@ app.post('/solicitacoes/:id/editar', somenteSolicitante, async (req, res) => {
         return res.redirect('/solicitacoes');
     }
 
+    const alteracoes = [];
+
+    if (solicitacao.titulo !== titulo) {
+        alteracoes.push('título');
+    }
+
+    if (solicitacao.descricao !== descricao) {
+        alteracoes.push('descrição');
+    }
+
+    if (solicitacao.prioridade !== prioridade) {
+        alteracoes.push('prioridade');
+    }
+
     solicitacao.titulo = titulo;
     solicitacao.descricao = descricao;
     solicitacao.prioridade = prioridade;
 
     await solicitacao.save();
+
+    if (alteracoes.length > 0) {
+
+        await registrarHistorico(
+            solicitacao.id,
+            'Edição',
+            'Campos alterados: ' + alteracoes.join(', ') + '.',
+            req.session.usuario
+        );
+
+    }
 
     res.redirect('/solicitacoes');
 
@@ -462,9 +539,23 @@ app.get('/solicitacoes/:id/acompanhar', autenticado, async (req, res) => {
         return res.redirect('/solicitacoes');
     }
 
+    const historicoRaw = await Historico.findAll({
+        where: {
+            solicitacaoId: solicitacao.id
+        },
+        order: [
+            ['createdAt', 'ASC'],
+            ['id', 'ASC']
+        ]
+    });
+
+    const historico = historicoRaw.map(h => h.toJSON());
+
     res.render('acompanharSolicitacao', {
 
         solicitacao,
+
+        historico,
 
         isAdmin:
             req.session.usuario.tipo === 'administrador'
@@ -506,9 +597,24 @@ app.post('/solicitacoes/:id/etapa', somenteAdmin, async (req, res) => {
         );
     }
 
+    const etapaAnterior = solicitacao.etapa;
+
     solicitacao.etapa = req.body.etapa;
 
     await solicitacao.save();
+
+    if (etapaAnterior !== req.body.etapa) {
+
+        await registrarHistorico(
+            solicitacao.id,
+            'Atualização de etapa',
+            'Etapa alterada de ' +
+                (NOMES_ETAPAS[etapaAnterior] || 'não definida') +
+                ' para ' + NOMES_ETAPAS[req.body.etapa] + '.',
+            req.session.usuario
+        );
+
+    }
 
     res.redirect(
         '/solicitacoes/' +
@@ -568,6 +674,13 @@ app.post('/solicitacoes/:id/aprovar', somenteAdmin, async (req, res) => {
 
     await solicitacao.save();
 
+    await registrarHistorico(
+        solicitacao.id,
+        'Aprovação',
+        'Solicitação aprovada. Etapa inicial: Em análise para compra.',
+        req.session.usuario
+    );
+
     res.redirect(
         '/solicitacoes/' +
         req.params.id +
@@ -613,6 +726,13 @@ app.post('/solicitacoes/:id/rejeitar', somenteAdmin, async (req, res) => {
     solicitacao.motivoRejeicao = motivoRejeicao;
 
     await solicitacao.save();
+
+    await registrarHistorico(
+        solicitacao.id,
+        'Rejeição',
+        'Solicitação rejeitada. Motivo: ' + motivoRejeicao,
+        req.session.usuario
+    );
 
     res.redirect(
         '/solicitacoes/' +
