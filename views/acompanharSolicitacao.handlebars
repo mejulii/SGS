@@ -338,6 +338,48 @@
 
     {{/ifEquals}}
 
+        <div class="form-box">
+
+        <h2>
+            Histórico de movimentações
+        </h2>
+
+        {{#if historico}}
+
+            <ol class="timeline">
+
+                {{#each historico}}
+
+                    <li class="timeline-item">
+
+                        <p class="timeline-evento">
+                            {{evento}}
+                        </p>
+
+                        <p class="timeline-data">
+                            {{formatDate createdAt}}{{#if responsavel}} · por {{responsavel}}{{/if}}
+                        </p>
+
+                        <p class="timeline-desc">
+                            {{descricao}}
+                        </p>
+
+                    </li>
+
+                {{/each}}
+
+            </ol>
+
+        {{else}}
+
+            <p class="empty-state">
+                Nenhuma movimentação registrada para esta solicitação.
+            </p>
+
+        {{/if}}
+
+    </div>
+
 </main>
 
 </body>
